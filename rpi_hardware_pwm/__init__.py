@@ -34,8 +34,12 @@ class HardwarePWM:
     chippath = "/sys/class/pwm/pwmchip0"
 
     def __init__(self, pwm_channel, hz):
+        assert pwm_channel in {0, 1}, "Only channel 0 and 1 are available on the Rpi."
+        assert hz > 0.1, "Frequency can't be lower than 0.1 on the Rpi."
+
         self.pwm_channel = pwm_channel
         self.pwm_dir = f"{self.chippath}/pwm{self.pwm_channel}"
+
         if not self.is_overlay_loaded():
             raise HardwarePWMException(
                 "Need to add 'dtoverlay=pwm-2chan' to /boot/config.txt and reboot"
