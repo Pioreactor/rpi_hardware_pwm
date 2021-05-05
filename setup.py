@@ -18,7 +18,7 @@ setup(
     license='OSI Approved :: GNU General Public License v3 (GPLv3)',
     description='Control Hardware PWM on the Raspberry Pi',
     long_description = long_description,
-    long_description_context_type = 'text/markdown',
+    long_description_content_type='text/markdown',
     author='Cam Davidson-Pilon',
     author_email='cam.davidson.pilon@gmail.com',
     url='https://github.com/Pioreactor/rpi_hardware_pwm',
