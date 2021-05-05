@@ -74,7 +74,6 @@ class HardwarePWM:
 
     def stop(self):
         self.change_duty_cycle(0)
-        self.change_frequency(0)
         self.echo(0, os.path.join(self.pwm_dir, "enable"))
 
     def change_duty_cycle(self, duty_cycle):
