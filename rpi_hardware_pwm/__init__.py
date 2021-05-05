@@ -2,32 +2,17 @@
 # -*- coding: utf-8 -*-
 import os.path
 
-# Copyright 2018 Jeremy Impson <jdimpson@acm.org>
-
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 3 of the License, or (at your option)
-# any later version.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.
-# See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, see <http://www.gnu.org/licenses>.
-
-
 class HardwarePWMException(Exception):
     pass
 
 
-# pwm0 is GPIO pin 18 is physical pin 12
-# pwm1 is GPIO pin 19 is physical pin 13
 
-# /sys/ pwm interface described here: https://www.jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
 class HardwarePWM:
     """
+    Control the hardware PWM on the Raspberry Pi. Need to first add `dtoverlay=pwm-2chan` to `/boot/config.txt`.
+
+    pwm0 is GPIO pin 18 is physical pin 12
+    pwm1 is GPIO pin 19 is physical pin 13
 
     Example
     ----------
@@ -40,7 +25,8 @@ class HardwarePWM:
 
     Notes
     --------
-    If you get "write error: Invalid argument" - you have to set duty_cycle to 0 before changing period
+     - If you get "write error: Invalid argument" - you have to set duty_cycle to 0 before changing period
+     - /sys/ pwm interface described here: https://jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
 
     """
 
