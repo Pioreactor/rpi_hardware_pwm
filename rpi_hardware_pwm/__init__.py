@@ -16,10 +16,11 @@ class HardwarePWM:
 
     Example
     ----------
-    >pwm = HardwarePWM(0, 20)
+    >pwm = HardwarePWM(0, hz=20)
     >pwm.start(100)
     >
     >pwm.change_duty_cycle(50)
+    >pwm.change_frequency(50)
     >
     >pwm.stop()
 
@@ -73,7 +74,11 @@ class HardwarePWM:
         self.echo(0, os.path.join(self.pwm_dir, "enable"))
 
     def change_duty_cycle(self, duty_cycle):
-        # a value between 0 and 100
+        """
+        a value between 0 and 100
+        0 represents always low.
+        100 represents always high.
+        """
         assert 0 <= duty_cycle <= 100
         self._duty_cycle = duty_cycle
         per = 1 / float(self._hz)
