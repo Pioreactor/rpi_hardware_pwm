@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 import os.path
 
 class HardwarePWMException(Exception):
@@ -48,6 +49,10 @@ class HardwarePWM:
             raise HardwarePWMException(f"Need write access to files in '{self.chippath}'")
         if not self.does_pwmX_exists():
             self.create_pwmX()
+
+        # pause to make sure we can write to the DIR
+        while not os.access(self.pwm_dir, os.W_OK | os.X_OK):
+            pass
 
         self._duty_cycle = 0
         self.change_frequency(hz)
