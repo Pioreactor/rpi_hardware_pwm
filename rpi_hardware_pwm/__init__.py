@@ -40,6 +40,7 @@ class HardwarePWM:
 
         self.pwm_channel = pwm_channel
         self.pwm_dir = f"{self.chippath}/pwm{self.pwm_channel}"
+        self._duty_cycle = 0
 
         if not self.is_overlay_loaded():
             raise HardwarePWMException(
@@ -50,12 +51,13 @@ class HardwarePWM:
         if not self.does_pwmX_exists():
             self.create_pwmX()
 
-        # pause to make sure we can write to the DIR
-        while not os.access(self.pwm_dir, os.W_OK | os.X_OK):
-            pass
+        while True:
+            try:
+                self.change_frequency(hz)
+                break
+            except PermissionError:
+                continue
 
-        self._duty_cycle = 0
-        self.change_frequency(hz)
 
     def is_overlay_loaded(self):
         return os.path.isdir(self.chippath)
