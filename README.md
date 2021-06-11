@@ -30,6 +30,6 @@ pwm.stop()
 
 ### History
 
-The original code is from [jdimpson/syspwm](https://github.com/jdimpson/syspwm), I've updated it to Python3 and
-made it look like the `RPi.GPIO` library's API (but more Pythonic than that.)
+The original code is from [jdimpson/syspwm](https://github.com/jdimpson/syspwm), We've updated it to Python3 and
+made it look like the `RPi.GPIO` library's API (but more Pythonic than that.), and we use it in [Pioreactor](https://pioreactor.com) bioreactor system.
 
