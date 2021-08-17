@@ -37,8 +37,9 @@ class HardwarePWM:
     chippath: str = "/sys/class/pwm/pwmchip0"
 
     def __init__(self, pwm_channel: int, hz: float):
-        assert pwm_channel in {0, 1}, "Only channel 0 and 1 are available on the Rpi."
-        assert hz > 0.1, "Frequency can't be lower than 0.1 on the Rpi."
+
+        if pwm_channel not in {0, 1}:
+            raise HardwarePWMException("Only channel 0 and 1 are available on the Rpi.")
 
         self.pwm_channel = pwm_channel
         self.pwm_dir = f"{self.chippath}/pwm{self.pwm_channel}"
@@ -91,7 +92,8 @@ class HardwarePWM:
         0 represents always low.
         100 represents always high.
         """
-        assert 0 <= duty_cycle <= 100
+        if not (0 <= duty_cycle <= 100):
+            raise HardwarePWMException("Duty cycle must be between 0 and 100 (inclusive).")
         self._duty_cycle = duty_cycle
         per = 1 / float(self._hz)
         per *= 1000  # now in milliseconds
@@ -100,6 +102,9 @@ class HardwarePWM:
         self.echo(dc, os.path.join(self.pwm_dir, "duty_cycle"))
 
     def change_frequency(self, hz: float):
+        if hz < 0.1,
+            raise HardwarePWMException("Frequency can't be lower than 0.1 on the Rpi.")
+
         self._hz = hz
 
         # we first have to change duty cycle, since https://stackoverflow.com/a/23050835/1895939
