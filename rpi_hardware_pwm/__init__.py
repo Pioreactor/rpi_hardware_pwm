@@ -32,9 +32,11 @@ class HardwarePWM:
 
     """
 
-    chippath = "/sys/class/pwm/pwmchip0"
+    _duty_cycle: float
+    _hz: float
+    chippath: str = "/sys/class/pwm/pwmchip0"
 
-    def __init__(self, pwm_channel, hz):
+    def __init__(self, pwm_channel: int, hz: float):
         assert pwm_channel in {0, 1}, "Only channel 0 and 1 are available on the Rpi."
         assert hz > 0.1, "Frequency can't be lower than 0.1 on the Rpi."
 
@@ -68,14 +70,14 @@ class HardwarePWM:
     def does_pwmX_exists(self):
         return os.path.isdir(self.pwm_dir)
 
-    def echo(self, m, fil):
-        with open(fil, "w") as f:
-            f.write(f"{m}\n")
+    def echo(self, message: int, file: str):
+        with open(file, "w") as f:
+            f.write(f"{message}\n")
 
     def create_pwmX(self):
         self.echo(self.pwm_channel, os.path.join(self.chippath, "export"))
 
-    def start(self, initial_duty_cycle):
+    def start(self, initial_duty_cycle: float):
         self.change_duty_cycle(initial_duty_cycle)
         self.echo(1, os.path.join(self.pwm_dir, "enable"))
 
@@ -83,7 +85,7 @@ class HardwarePWM:
         self.change_duty_cycle(0)
         self.echo(0, os.path.join(self.pwm_dir, "enable"))
 
-    def change_duty_cycle(self, duty_cycle):
+    def change_duty_cycle(self, duty_cycle: float):
         """
         a value between 0 and 100
         0 represents always low.
@@ -97,14 +99,16 @@ class HardwarePWM:
         dc = int(per * duty_cycle / 100)
         self.echo(dc, os.path.join(self.pwm_dir, "duty_cycle"))
 
-    def change_frequency(self, hz):
-        self._hz = hz
+    def change_frequency(self, hz: float):
 
         # we first have to change duty cycle, since https://stackoverflow.com/a/23050835/1895939
-        if self._duty_cycle:
-            self.change_duty_cycle(self._duty_cycle)
+        original_duty_cycle = self._duty_cycle
+        self.change_duty_cycle(0)
 
+        self._hz = hz
         per = 1 / float(self._hz)
         per *= 1000  # now in milliseconds
         per *= 1_000_000  # now in nanoseconds
         self.echo(int(per), os.path.join(self.pwm_dir, "period"))
+
+        self.change_duty_cycle(original_duty_cycle)

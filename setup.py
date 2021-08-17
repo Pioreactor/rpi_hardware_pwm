@@ -1,5 +1,4 @@
-from distutils.core import setup
-from setuptools import find_packages
+from setuptools import setup, find_packages
 import os
 
 
@@ -14,7 +13,7 @@ except Exception:
 setup(
     name="rpi_hardware_pwm",
     packages=find_packages('.'),
-    version='0.0.2',
+    version='0.1.0',
     license='OSI Approved :: GNU General Public License v3 (GPLv3)',
     description='Control Hardware PWM on the Raspberry Pi',
     long_description = long_description,
@@ -24,7 +23,7 @@ setup(
     url='https://github.com/Pioreactor/rpi_hardware_pwm',
     keywords=["raspberry pi", "pwm"],
     install_requires=[],
-    python_requires='>=3',
+    python_requires='>=3.5',
     # https://pypi.org/classifiers/
     classifiers=["Development Status :: 4 - Beta", "Topic :: System :: Hardware", ]
 )
