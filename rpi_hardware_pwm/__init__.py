@@ -102,7 +102,7 @@ class HardwarePWM:
         self.echo(dc, os.path.join(self.pwm_dir, "duty_cycle"))
 
     def change_frequency(self, hz: float):
-        if hz < 0.1,
+        if hz < 0.1:
             raise HardwarePWMException("Frequency can't be lower than 0.1 on the Rpi.")
 
         self._hz = hz
