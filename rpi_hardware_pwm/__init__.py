@@ -100,12 +100,12 @@ class HardwarePWM:
         self.echo(dc, os.path.join(self.pwm_dir, "duty_cycle"))
 
     def change_frequency(self, hz: float):
+        self._hz = hz
 
         # we first have to change duty cycle, since https://stackoverflow.com/a/23050835/1895939
         original_duty_cycle = self._duty_cycle
         self.change_duty_cycle(0)
 
-        self._hz = hz
         per = 1 / float(self._hz)
         per *= 1000  # now in milliseconds
         per *= 1_000_000  # now in nanoseconds

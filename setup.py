@@ -13,7 +13,7 @@ except Exception:
 setup(
     name="rpi_hardware_pwm",
     packages=find_packages('.'),
-    version='0.1.0',
+    version='0.1.1',
     license='OSI Approved :: GNU General Public License v3 (GPLv3)',
     description='Control Hardware PWM on the Raspberry Pi',
     long_description = long_description,
