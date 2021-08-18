@@ -109,7 +109,8 @@ class HardwarePWM:
 
         # we first have to change duty cycle, since https://stackoverflow.com/a/23050835/1895939
         original_duty_cycle = self._duty_cycle
-        self.change_duty_cycle(0)
+        if self._duty_cycle:
+            self.change_duty_cycle(0)
 
         per = 1 / float(self._hz)
         per *= 1000  # now in milliseconds
