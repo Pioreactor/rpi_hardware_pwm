@@ -4,12 +4,11 @@ Access the hardware PWM of a RaspberryPi with Python. More lightweight than alte
 
 ### Installation
 
-Installation is a two step process:
-
-1. On the Raspberry Pi, add `dtoverlay=pwm-2chan` to `/boot/config.txt`. **Reboot your Raspberry Pi**. This defaults to GPIO_18 as the pin for PWM0 and GPIO_19 as the pin for PWM1.
-    - Alternatively, you can change GPIO_18 to GPIO_12 and GPIO_19 to GPIO_13 using `dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4`.
+1. On the Raspberry Pi, add `dtoverlay=pwm-2chan` to `/boot/config.txt`. This defaults to `GPIO_18` as the pin for `PWM0` and `GPIO_19` as the pin for `PWM1`.
+    - Alternatively, you can change `GPIO_18` to `GPIO_12` and `GPIO_19` to `GPIO_13` using `dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4`.
+2. **Reboot your Raspberry Pi**.
     - You can check everything is working on running `lsmod | grep pwm` and looking for `pwm_bcm2835`
-2. Install this library: `sudo pip install rpi-hardware-pwm`
+3. Install this library: `sudo pip3 install rpi-hardware-pwm`
 
 
 
