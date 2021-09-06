@@ -17,7 +17,7 @@ Access the hardware PWM of a RaspberryPi with Python. More lightweight than alte
 ```python
 from rpi_hardware_pwm import HardwarePWM
 
-pwm = HardwarePWM(0, hz=60)
+pwm = HardwarePWM(pwm_channel=0, hz=60)
 pwm.start(100) # full duty cycle
 
 pwm.change_duty_cycle(50)
