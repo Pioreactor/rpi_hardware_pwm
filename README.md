@@ -1,6 +1,8 @@
-# rpi_hardware_pwm
+# rpi hardware pwm
+[![PyPi version](https://pypip.in/v/rpi-hardware-pwm/badge.png)](https://crate.io/packages/rpi-hardware-pwm/)
+![CI status](https://github.com/pioreactor/rpi_hardware_pwm/actions/workflows/ci.yaml/badge.svg)
 
-Access the hardware PWM of a RaspberryPi with Python. More lightweight than alternatives.
+Access the hardware PWM of a Raspberry Pi with Python. More lightweight than alternatives.
 
 ### Installation
 
