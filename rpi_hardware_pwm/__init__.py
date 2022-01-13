@@ -36,7 +36,7 @@ class HardwarePWM:
     _hz: float
     chippath: str = "/sys/class/pwm/pwmchip0"
 
-    def __init__(self, pwm_channel: int, hz: float):
+    def __init__(self, pwm_channel: int, hz: float) -> None:
 
         if pwm_channel not in {0, 1}:
             raise HardwarePWMException("Only channel 0 and 1 are available on the Rpi.")
@@ -62,31 +62,31 @@ class HardwarePWM:
                 continue
 
 
-    def is_overlay_loaded(self):
+    def is_overlay_loaded(self) -> bool:
         return os.path.isdir(self.chippath)
 
-    def is_export_writable(self):
+    def is_export_writable(self) -> bool:
         return os.access(os.path.join(self.chippath, "export"), os.W_OK)
 
-    def does_pwmX_exists(self):
+    def does_pwmX_exists(self) -> bool:
         return os.path.isdir(self.pwm_dir)
 
-    def echo(self, message: int, file: str):
+    def echo(self, message: int, file: str) -> None:
         with open(file, "w") as f:
             f.write(f"{message}\n")
 
-    def create_pwmX(self):
+    def create_pwmX(self) -> None:
         self.echo(self.pwm_channel, os.path.join(self.chippath, "export"))
 
-    def start(self, initial_duty_cycle: float):
+    def start(self, initial_duty_cycle: float) -> None:
         self.change_duty_cycle(initial_duty_cycle)
         self.echo(1, os.path.join(self.pwm_dir, "enable"))
 
-    def stop(self):
+    def stop(self) -> None:
         self.change_duty_cycle(0)
         self.echo(0, os.path.join(self.pwm_dir, "enable"))
 
-    def change_duty_cycle(self, duty_cycle: float):
+    def change_duty_cycle(self, duty_cycle: float) -> None:
         """
         a value between 0 and 100
         0 represents always low.
@@ -101,7 +101,7 @@ class HardwarePWM:
         dc = int(per * duty_cycle / 100)
         self.echo(dc, os.path.join(self.pwm_dir, "duty_cycle"))
 
-    def change_frequency(self, hz: float):
+    def change_frequency(self, hz: float) -> None:
         if hz < 0.1:
             raise HardwarePWMException("Frequency can't be lower than 0.1 on the Rpi.")
 
