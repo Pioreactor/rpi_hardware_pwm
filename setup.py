@@ -23,7 +23,7 @@ setup(
     url='https://github.com/Pioreactor/rpi_hardware_pwm',
     keywords=["raspberry pi", "pwm", "hardware"],
     package_data={"rpi_hardware_pwm": ["py.typed"]},
-    install_requires=[],
+    install_requires=["vcgencmd"],
     python_requires='>=3.5',
     # https://pypi.org/classifiers/
     classifiers=["Development Status :: 4 - Beta", "Topic :: System :: Hardware", ]
