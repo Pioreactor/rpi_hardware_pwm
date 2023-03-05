@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import os.path
+from vcgencmd import Vcgencmd
 
 class HardwarePWMException(Exception):
     pass
@@ -44,6 +45,7 @@ class HardwarePWM:
         self.pwm_channel = pwm_channel
         self.pwm_dir = f"{self.chippath}/pwm{self.pwm_channel}"
         self._duty_cycle = 0
+        self.vcgen = Vcgencmd()
 
         if not self.is_overlay_loaded():
             raise HardwarePWMException(
@@ -115,6 +117,7 @@ class HardwarePWM:
         per = 1 / float(self._hz)
         per *= 1000  # now in milliseconds
         per *= 1_000_000  # now in nanoseconds
+        per = per / (vcgm.measure_clock('pwm')/100000000)
         self.echo(int(per), os.path.join(self.pwm_dir, "period"))
 
         self.change_duty_cycle(original_duty_cycle)
