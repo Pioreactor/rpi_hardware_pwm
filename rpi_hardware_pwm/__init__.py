@@ -27,6 +27,7 @@ class HardwarePWM:
 
     Notes
     --------
+     - For Rpi 1,2,3,4, use chip=0; For Rpi 5, use chip=2
      - If you get "write error: Invalid argument" - you have to set duty_cycle to 0 before changing period
      - /sys/ pwm interface described here: https://jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
 
@@ -34,13 +35,13 @@ class HardwarePWM:
 
     _duty_cycle: float
     _hz: float
-    chippath: str = "/sys/class/pwm/pwmchip0"
 
-    def __init__(self, pwm_channel: int, hz: float) -> None:
+    def __init__(self, pwm_channel: int, hz: float, chip: int = 0) -> None:
 
         if pwm_channel not in {0, 1}:
             raise HardwarePWMException("Only channel 0 and 1 are available on the Rpi.")
 
+        self.chippath: str = f"/sys/class/pwm/pwmchip{chip}"
         self.pwm_channel = pwm_channel
         self.pwm_dir = f"{self.chippath}/pwm{self.pwm_channel}"
         self._duty_cycle = 0

@@ -16,10 +16,15 @@ Access the hardware PWM of a Raspberry Pi with Python. More lightweight than alt
 
 ### Examples
 
+
+> For Rpi 1,2,3,4, use chip=0; For Rpi 5, use chip=2
+
+
+
 ```python
 from rpi_hardware_pwm import HardwarePWM
 
-pwm = HardwarePWM(pwm_channel=0, hz=60)
+pwm = HardwarePWM(pwm_channel=0, hz=60, chip=0)
 pwm.start(100) # full duty cycle
 
 pwm.change_duty_cycle(50)
