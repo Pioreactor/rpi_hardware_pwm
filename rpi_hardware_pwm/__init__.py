@@ -36,6 +36,7 @@ class HardwarePWM:
 
     _duty_cycle: float
     _hz: float
+    chippath: str = "/sys/class/pwm/pwmchip0" # mostly here for testing
 
     def __init__(self, pwm_channel: int, hz: float, chip: int = 0) -> None:
 
