@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+from time import perf_counter
+from time import sleep
 import os.path
 
 class HardwarePWMException(Exception):
@@ -71,6 +73,9 @@ class HardwarePWM:
     def is_export_writable(self) -> bool:
         return os.access(os.path.join(self.chippath, "export"), os.W_OK)
 
+    def is_pwmdir_writable(self) -> bool:
+        return os.access(self.pwm_dir, os.W_OK)
+
     def does_pwmX_exists(self) -> bool:
         return os.path.isdir(self.pwm_dir)
 
@@ -78,8 +83,14 @@ class HardwarePWM:
         with open(file, "w") as f:
             f.write(f"{message}\n")
 
-    def create_pwmX(self) -> None:
+    def create_pwmX(self, timeout=10.0) -> None:
         self.echo(self.pwm_channel, os.path.join(self.chippath, "export"))
+        start = perf_counter()
+        while True:
+            if self.does_pwmX_exists() and self.is_pwmdir_writable():
+                break
+            if perf_counter() - start > timeout:
+                raise PermissionError(f"Unable to create/write to {self.pwm_dir}")
 
     def start(self, initial_duty_cycle: float) -> None:
         self.change_duty_cycle(initial_duty_cycle)
@@ -137,8 +148,9 @@ class HardwarePWM:
 if __name__ == "__main__":
     pwm = HardwarePWM(pwm_channel=0, hz=60, chip=0)
     pwm.start(100) # full duty cycle
-
+    sleep(2)
     pwm.change_duty_cycle(50)
+    sleep(2)
     pwm.change_frequency(25_000)
-
+    sleep(2)
     pwm.stop()
