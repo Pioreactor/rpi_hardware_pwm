@@ -27,26 +27,30 @@ class HardwarePWM:
 
     Notes
     --------
-     - For Rpi 1,2,3,4, use chip=0; For Rpi 5, use chip=2
+     - For Rpi 1,2,3,4, use chip=0; For Rpi 5, use chip=2. Update: As of linux kernel 6.12, chip=0 is used for all models.
      - For Rpi 1,2,3,4 only channels 0 and 1 are available
      - If you get "write error: Invalid argument" - you have to set duty_cycle to 0 before changing period
-     - /sys/ pwm interface described here: https://jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
+     - /sys/ pwm interface described here: https://web.archive.org/web/20200722035349/https://jumpnowtek.com/rpi/Using-the-Raspberry-Pi-Hardware-PWM-timers.html
 
     """
 
     _duty_cycle: float
     _hz: float
-    chippath: str = "/sys/class/pwm/pwmchip0" # mostly here for testing
+    chippath: str = ""
 
     def __init__(self, pwm_channel: int, hz: float, chip: int = 0) -> None:
 
         if pwm_channel not in {0, 1, 2, 3}:
             raise HardwarePWMException("Only channel 0 and 1 and 2 and 3 are available on the Rpi.")
 
+        if hz < 0.1:
+            raise HardwarePWMException("Frequency can't be lower than 0.1 on the Rpi.")
+
         self.chippath: str = f"/sys/class/pwm/pwmchip{chip}"
         self.pwm_channel = pwm_channel
         self.pwm_dir = f"{self.chippath}/pwm{self.pwm_channel}"
         self._duty_cycle = 0
+        self._hz = hz
 
         if not self.is_overlay_loaded():
             raise HardwarePWMException(
@@ -57,12 +61,8 @@ class HardwarePWM:
         if not self.does_pwmX_exists():
             self.create_pwmX()
 
-        while True:
-            try:
-                self.change_frequency(hz)
-                break
-            except PermissionError:
-                continue
+        self.__init_frequency(self._hz) # set this first before DC
+        self.__init_dc(self._duty_cycle)
 
 
     def is_overlay_loaded(self) -> bool:
@@ -112,8 +112,7 @@ class HardwarePWM:
 
         # we first have to change duty cycle, since https://stackoverflow.com/a/23050835/1895939
         original_duty_cycle = self._duty_cycle
-        if self._duty_cycle:
-            self.change_duty_cycle(0)
+        self.change_duty_cycle(0)
 
         per = 1 / float(self._hz)
         per *= 1000  # now in milliseconds
@@ -121,3 +120,25 @@ class HardwarePWM:
         self.echo(int(per), os.path.join(self.pwm_dir, "period"))
 
         self.change_duty_cycle(original_duty_cycle)
+
+    def __init_frequency(self, hz: float) -> None:
+        assert self._duty_cycle == 0
+
+        per = 1 / float(hz)
+        per *= 1000  # now in milliseconds
+        per *= 1_000_000  # now in nanoseconds
+        self.echo(int(per), os.path.join(self.pwm_dir, "period"))
+
+    def __init_dc(self, dc: float) -> None:
+        assert dc == 0
+        self.echo(dc, os.path.join(self.pwm_dir, "duty_cycle"))
+
+
+if __name__ == "__main__":
+    pwm = HardwarePWM(pwm_channel=0, hz=60, chip=0)
+    pwm.start(100) # full duty cycle
+
+    pwm.change_duty_cycle(50)
+    pwm.change_frequency(25_000)
+
+    pwm.stop()
