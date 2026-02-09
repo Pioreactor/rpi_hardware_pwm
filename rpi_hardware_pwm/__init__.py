@@ -62,9 +62,13 @@ class HardwarePWM:
             raise HardwarePWMException(f"Need write access to files in '{self.chippath}'")
         if not self.does_pwmX_exists():
             self.create_pwmX()
+        else:
+            self.wait_for_pwmX_ready()
 
-        self.__init_frequency(self._hz) # set this first before DC
-        self.__init_dc(self._duty_cycle)
+        # On first export, sysfs control files can exist before write permissions
+        # are fully applied. Retry briefly to avoid flaky startup failures.
+        self._retry_on_permission_error(lambda: self.__init_frequency(self._hz)) # set this first before DC
+        self._retry_on_permission_error(lambda: self.__init_dc(self._duty_cycle))
 
 
     def is_overlay_loaded(self) -> bool:
@@ -76,6 +80,10 @@ class HardwarePWM:
     def is_pwmdir_writable(self) -> bool:
         return os.access(self.pwm_dir, os.W_OK)
 
+    def is_control_writable(self, control_file: str) -> bool:
+        control_path = os.path.join(self.pwm_dir, control_file)
+        return os.path.exists(control_path) and os.access(control_path, os.W_OK)
+
     def does_pwmX_exists(self) -> bool:
         return os.path.isdir(self.pwm_dir)
 
@@ -85,12 +93,34 @@ class HardwarePWM:
 
     def create_pwmX(self, timeout=10.0) -> None:
         self.echo(self.pwm_channel, os.path.join(self.chippath, "export"))
+        self.wait_for_pwmX_ready(timeout=timeout)
+
+    def wait_for_pwmX_ready(self, timeout=10.0) -> None:
+        required_controls = ("period", "duty_cycle", "enable")
         start = perf_counter()
         while True:
-            if self.does_pwmX_exists() and self.is_pwmdir_writable():
-                break
+            if self.does_pwmX_exists() and all(self.is_control_writable(c) for c in required_controls):
+                return
+
             if perf_counter() - start > timeout:
-                raise PermissionError(f"Unable to create/write to {self.pwm_dir}")
+                controls = ", ".join(required_controls)
+                raise PermissionError(f"Unable to create/write to {self.pwm_dir} ({controls})")
+            sleep(0.01)
+
+    @staticmethod
+    def _retry_on_permission_error(action, timeout=0.5) -> None:
+        start = perf_counter()
+        attempt = 0
+        while True:
+            try:
+                action()
+                return
+            except PermissionError:
+                if perf_counter() - start >= timeout:
+                    raise
+
+                attempt += 1
+                sleep(min(0.05 * attempt, 0.2))
 
     def start(self, initial_duty_cycle: float) -> None:
         self.change_duty_cycle(initial_duty_cycle)
